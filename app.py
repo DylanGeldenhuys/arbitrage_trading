@@ -45,15 +45,19 @@ if view == "Phase Space Evolution":
     no_arb = window[window['arbitrage'] == 0]
 
     fig, ax = plt.subplots(figsize=(8, 6))
-    sns.kdeplot(data=window, x='spread', y='volatility', fill=True, cmap='Greys', thresh=0.05, alpha=0.4, ax=ax)
+    sns.kdeplot(
+        data=window, x='spread', y='volatility',
+        fill=True, cmap='Greys', thresh=0.05, alpha=0.4,
+        ax=ax, bw_adjust=1.5
+    )
     ax.plot(window['spread'], window['volatility'], color='black', alpha=0.4, linestyle='--', linewidth=1, label='Trajectory')
     ax.scatter(no_arb['spread'], no_arb['volatility'], color='blue', alpha=0.5, s=30, label='No Arbitrage')
     ax.scatter(arb['spread'], arb['volatility'], color='red', alpha=0.8, s=40, label='Arbitrage')
     ax.set_title(f"Phase Space: Time {t_start} to {t_start + 49}")
     ax.set_xlabel("Spread")
     ax.set_ylabel("Volatility")
-    ax.set_xlim(0, max(data['spread'].max(), 6))
-    ax.set_ylim(0, max(data['volatility'].max(), 0.06))
+    ax.set_xlim(data['spread'].min() - 0.5, data['spread'].max() + 0.5)
+    ax.set_ylim(data['volatility'].min() - 0.01, data['volatility'].max() + 0.01)
     ax.legend()
     ax.grid(True)
     st.pyplot(fig)
@@ -87,7 +91,7 @@ elif view == "Bifurcation Explorer":
     sns.kdeplot(
         data=df, x='spread', y='volatility', fill=True,
         cmap='Greys', thresh=0.05, alpha=0.4,
-        ax=ax, clip=((spread_min, spread_max), (vol_min, vol_max))
+        ax=ax, clip=((spread_min, spread_max), (vol_min, vol_max)), bw_adjust=1.5
     )
     ax.scatter(arb['spread'], arb['volatility'], color='red', s=40, alpha=0.8, label='Arbitrage')
 
