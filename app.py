@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy.stats import gaussian_kde
 
 # --- Utilities ---
 def generate_ar_series(n, mean, phi, sigma):
@@ -46,13 +47,22 @@ if view == "Phase Space Evolution":
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    # --- Global KDE background ---
-    sns.kdeplot(
-        data=data, x='spread', y='volatility', fill=True,
-        cmap='Greys', thresh=0.05, alpha=0.3, ax=ax, bw_adjust=1.2
+    # KDE via imshow
+    xy = np.vstack([window['spread'], window['volatility']])
+    kde = gaussian_kde(xy)(xy)
+    xi, yi = np.mgrid[
+        window['spread'].min():window['spread'].max():100j,
+        window['volatility'].min():window['volatility'].max():100j
+    ]
+    zi = gaussian_kde(xy)(np.vstack([xi.flatten(), yi.flatten()])).reshape(xi.shape)
+    ax.imshow(
+        np.rot90(zi),
+        extent=[xi.min(), xi.max(), yi.min(), yi.max()],
+        cmap='Greys',
+        alpha=0.4,
+        aspect='auto'
     )
 
-    # --- Local overlay ---
     ax.plot(window['spread'], window['volatility'], color='black', alpha=0.4, linestyle='--', linewidth=1, label='Trajectory')
     ax.scatter(no_arb['spread'], no_arb['volatility'], color='blue', alpha=0.5, s=30, label='No Arbitrage')
     ax.scatter(arb['spread'], arb['volatility'], color='red', alpha=0.8, s=40, label='Arbitrage')
@@ -88,12 +98,22 @@ elif view == "Bifurcation Explorer":
     arb = df[df['arbitrage'] == 1]
 
     fig, ax = plt.subplots(figsize=(8, 6))
-    sns.kdeplot(
-        data=df, x='spread', y='volatility', fill=True,
-        cmap='Greys', thresh=0.05, alpha=0.4, ax=ax, bw_adjust=1.5
-    )
-    ax.scatter(arb['spread'], arb['volatility'], color='red', s=40, alpha=0.8, label='Arbitrage')
 
+    xy = np.vstack([df['spread'], df['volatility']])
+    xi, yi = np.mgrid[
+        df['spread'].min():df['spread'].max():100j,
+        df['volatility'].min():df['volatility'].max():100j
+    ]
+    zi = gaussian_kde(xy)(np.vstack([xi.flatten(), yi.flatten()])).reshape(xi.shape)
+    ax.imshow(
+        np.rot90(zi),
+        extent=[xi.min(), xi.max(), yi.min(), yi.max()],
+        cmap='Greys',
+        alpha=0.4,
+        aspect='auto'
+    )
+
+    ax.scatter(arb['spread'], arb['volatility'], color='red', s=40, alpha=0.8, label='Arbitrage')
     arb_rate = df['arbitrage'].mean() * 100
     ax.set_title(f"Bifurcation View\nLiquidity = {int(liquidity_mean):,}, Latency = {int(latency_mean)} ms, Volatility = {volatility_mean:.3f} | Arbitrage Rate: {arb_rate:.1f}%")
     ax.set_xlabel("Spread")
