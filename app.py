@@ -45,15 +45,17 @@ if view == "Phase Space Evolution":
     no_arb = window[window['arbitrage'] == 0]
 
     fig, ax = plt.subplots(figsize=(8, 6))
-    sns.kdeplot(data=window, x='spread', y='volatility', fill=True, cmap='Greys', thresh=0.05, alpha=0.4, ax=ax)
+    sns.kdeplot(
+        data=window, x='spread', y='volatility', fill=True,
+        cmap='Greys', thresh=0.05, alpha=0.4, ax=ax, bw_adjust=1.5
+    )
     ax.plot(window['spread'], window['volatility'], color='black', alpha=0.4, linestyle='--', linewidth=1, label='Trajectory')
     ax.scatter(no_arb['spread'], no_arb['volatility'], color='blue', alpha=0.5, s=30, label='No Arbitrage')
     ax.scatter(arb['spread'], arb['volatility'], color='red', alpha=0.8, s=40, label='Arbitrage')
+
     ax.set_title(f"Phase Space: Time {t_start} to {t_start + 49}")
     ax.set_xlabel("Spread")
     ax.set_ylabel("Volatility")
-    ax.set_xlim(0, max(data['spread'].max(), 6))
-    ax.set_ylim(0, max(data['volatility'].max(), 0.06))
     ax.legend()
     ax.grid(True)
     st.pyplot(fig)
@@ -80,15 +82,18 @@ elif view == "Bifurcation Explorer":
     })
 
     arb = df[df['arbitrage'] == 1]
+
     fig, ax = plt.subplots(figsize=(8, 6))
-    sns.kdeplot(data=df, x='spread', y='volatility', fill=True, cmap='Greys', thresh=0.05, alpha=0.4, ax=ax)
+    sns.kdeplot(
+        data=df, x='spread', y='volatility', fill=True,
+        cmap='Greys', thresh=0.05, alpha=0.4, ax=ax, bw_adjust=1.5
+    )
     ax.scatter(arb['spread'], arb['volatility'], color='red', s=40, alpha=0.8, label='Arbitrage')
+
     arb_rate = df['arbitrage'].mean() * 100
-    ax.set_title(f"Bifurcation View\nLiquidity = {int(liquidity_mean):,}, Latency = {int(latency_mean)} ms, Volatility = {volatility_mean:.3f}\nArbitrage Rate: {arb_rate:.1f}%")
+    ax.set_title(f"Bifurcation View\nLiquidity = {int(liquidity_mean):,}, Latency = {int(latency_mean)} ms, Volatility = {volatility_mean:.3f} | Arbitrage Rate: {arb_rate:.1f}%")
     ax.set_xlabel("Spread")
     ax.set_ylabel("Volatility")
-    ax.set_xlim(0, max(df['spread'].max(), 6))
-    ax.set_ylim(0, max(df['volatility'].max(), 0.06))
     ax.legend()
     ax.grid(True)
     st.pyplot(fig)
