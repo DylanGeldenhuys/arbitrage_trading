@@ -27,7 +27,7 @@ view = st.sidebar.selectbox("Choose View", ["Phase Space Evolution", "Bifurcatio
 
 # --- Phase Space Evolution ---
 if view == "Phase Space Evolution":
-    st.title("Phase Space: Trajectory + Arbitrage Zones")
+    st.title("Phase Space: Trajectory + Arbitrage Zones.")
 
     np.random.seed(42)
     n = 1000
