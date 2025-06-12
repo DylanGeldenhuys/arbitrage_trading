@@ -45,14 +45,18 @@ if view == "Phase Space Evolution":
     no_arb = window[window['arbitrage'] == 0]
 
     fig, ax = plt.subplots(figsize=(8, 6))
+
+    # Global KDE background
     sns.kdeplot(
-        data=window, x='spread', y='volatility',
-        fill=True, cmap='Greys', thresh=0.05, alpha=0.4,
-        ax=ax, bw_adjust=1.5
+        data=data, x='spread', y='volatility', fill=True,
+        cmap='Greys', thresh=0.05, alpha=0.3, ax=ax, bw_adjust=1.2
     )
+
+    # Overlay local window trajectory
     ax.plot(window['spread'], window['volatility'], color='black', alpha=0.4, linestyle='--', linewidth=1, label='Trajectory')
     ax.scatter(no_arb['spread'], no_arb['volatility'], color='blue', alpha=0.5, s=30, label='No Arbitrage')
     ax.scatter(arb['spread'], arb['volatility'], color='red', alpha=0.8, s=40, label='Arbitrage')
+
     ax.set_title(f"Phase Space: Time {t_start} to {t_start + 49}")
     ax.set_xlabel("Spread")
     ax.set_ylabel("Volatility")
