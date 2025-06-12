@@ -4,6 +4,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+import matplotlib
+matplotlib.use('Agg')  # Use non-GUI backend suitable for Streamlit
+
+
 # --- Utilities ---
 def generate_ar_series(n, mean, phi, sigma):
     x = np.zeros(n)
