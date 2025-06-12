@@ -4,10 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-import matplotlib
-matplotlib.use('Agg')  # Use non-GUI backend suitable for Streamlit
-
-
 # --- Utilities ---
 def generate_ar_series(n, mean, phi, sigma):
     x = np.zeros(n)
@@ -27,7 +23,7 @@ view = st.sidebar.selectbox("Choose View", ["Phase Space Evolution", "Bifurcatio
 
 # --- Phase Space Evolution ---
 if view == "Phase Space Evolution":
-    st.title("Phase Space: Trajectory + Arbitrage Zones.")
+    st.title("Phase Space: Trajectory + Arbitrage Zones")
 
     np.random.seed(42)
     n = 1000
@@ -49,17 +45,14 @@ if view == "Phase Space Evolution":
     no_arb = window[window['arbitrage'] == 0]
 
     fig, ax = plt.subplots(figsize=(8, 6))
+
+    # --- Global KDE background ---
     sns.kdeplot(
-        data=window,
-        x='spread', y='volatility',
-        fill=False,
-        cmap='Greys',
-        levels=10,
-        thresh=0.05,
-        alpha=0.6,
-        bw_adjust=1.2,
-        ax=ax
+        data=data, x='spread', y='volatility', fill=True,
+        cmap='Greys', thresh=0.05, alpha=0.3, ax=ax, bw_adjust=1.2
     )
+
+    # --- Local overlay ---
     ax.plot(window['spread'], window['volatility'], color='black', alpha=0.4, linestyle='--', linewidth=1, label='Trajectory')
     ax.scatter(no_arb['spread'], no_arb['volatility'], color='blue', alpha=0.5, s=30, label='No Arbitrage')
     ax.scatter(arb['spread'], arb['volatility'], color='red', alpha=0.8, s=40, label='Arbitrage')
