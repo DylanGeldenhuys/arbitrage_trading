@@ -1,5 +1,6 @@
-streamlit
-matplotlib
-seaborn
-numpy
+
+seaborn>=0.11.2
+matplotlib>=3.3
 pandas
+numpy
+streamlit
