@@ -80,15 +80,23 @@ elif view == "Bifurcation Explorer":
     })
 
     arb = df[df['arbitrage'] == 1]
+    spread_min, spread_max = df['spread'].min(), df['spread'].max()
+    vol_min, vol_max = df['volatility'].min(), df['volatility'].max()
+
     fig, ax = plt.subplots(figsize=(8, 6))
-    sns.kdeplot(data=df, x='spread', y='volatility', fill=True, cmap='Greys', thresh=0.05, alpha=0.4, ax=ax)
+    sns.kdeplot(
+        data=df, x='spread', y='volatility', fill=True,
+        cmap='Greys', thresh=0.05, alpha=0.4,
+        ax=ax, clip=((spread_min, spread_max), (vol_min, vol_max))
+    )
     ax.scatter(arb['spread'], arb['volatility'], color='red', s=40, alpha=0.8, label='Arbitrage')
+
     arb_rate = df['arbitrage'].mean() * 100
-    ax.set_title(f"Bifurcation View\nLiquidity = {int(liquidity_mean):,}, Latency = {int(latency_mean)} ms, Volatility = {volatility_mean:.3f}\nArbitrage Rate: {arb_rate:.1f}%")
+    ax.set_title(f"Bifurcation View\nLiquidity = {int(liquidity_mean):,}, Latency = {int(latency_mean)} ms, Volatility = {volatility_mean:.3f} | Arbitrage Rate: {arb_rate:.1f}%")
     ax.set_xlabel("Spread")
     ax.set_ylabel("Volatility")
-    ax.set_xlim(0, max(df['spread'].max(), 6))
-    ax.set_ylim(0, max(df['volatility'].max(), 0.06))
+    ax.set_xlim(spread_min - 0.5, spread_max + 0.5)
+    ax.set_ylim(vol_min - 0.01, vol_max + 0.01)
     ax.legend()
     ax.grid(True)
     st.pyplot(fig)
